@@ -1,6 +1,6 @@
 angular.module('starter.controllers', [])
 
-.controller('AppCtrl', function($scope, $ionicModal, $timeout) {
+.controller('AppCtrl', function($scope, $ionicModal, $timeout, $rootScope, $cordovaOauth, $http) {
 
   // With the new view caching in Ionic, Controllers are only called
   // when they are recreated or on app start, instead of every page change.
@@ -25,23 +25,48 @@ angular.module('starter.controllers', [])
   };
 
   // Open the login modal
-  $scope.login = function() {
+  $scope.login = function()
+  {
+
+//I have not had any success getting this to work, and even the author's test didn't work though I followed his instructions.
+//It's commented out for now, just to show the logic I used.
+	  
+//	  $cordovaOauth.facebook("336777606701145", ["public_profile"],{redirect_uri:"http://localhost/callback"})
+//	.then(function(result)
+//	{
+//		//Save data here, result.access_token.
+//		fetchName(result.access_token);
+//    },
+//	function(error)
+//	{
+//    	alert("Error: " + error);
+//    });
     $scope.modal.show();
   };
 
   // Perform the login action when the user submits the login form
   $scope.doLogin = function() {
-    console.log('Doing login', $scope.loginData);
-
+   
     // Simulate a login delay. Remove this and replace with your login
     // code if using a login system
     $timeout(function() {
       $scope.closeLogin();
+	  $rootScope.isLoggedIn=true;
+		
+	//Saving emulation here.
+	  $rootScope.token=$scope.loginData;
+	  window.localStorage.setItem("FB_key",$scope.loginData);
     }, 1000);
   };
+	
+//	$scope.fetchName=function(access_token)
+//	{
+//		//Connect to using https://graph.facebook.com/v2.8/me, pass access_token.
+//		//$rootScope.username=name once you get it.
+//	}
 })
 
-.controller('PlaylistsCtrl', function($scope, $rootScope) {
+.controller('PlaylistsCtrl', function($scope, $rootScope, this_session) {
   $scope.playlists = [
     { title: 'Reggae', id: 1 },
     { title: 'Chill', id: 2 },
@@ -50,59 +75,32 @@ angular.module('starter.controllers', [])
     { title: 'Rap', id: 5 },
     { title: 'Cowbell', id: 6 }
   ];
+
 	
-	$rootScope.$broadcast("display",{});
+	$scope.terminate = function()
+	{
+		this_session.terminate();
+	};
 })
 
-.controller('PlaylistCtrl', function($scope, $stateParams) {
+.controller('PlaylistCtrl', function($scope, $stateParams,this_session) {
+	$scope.terminate = function()
+	{
+		this_session.terminate();
+	};
 })
 
-.controller('LoginpopoverCtrl', function($scope, $ionicPopup)
+.factory('this_session',function($rootScope)
 {
-//		$ionicPopover
-//	  .fromTemplateUrl('templates/login.html',{scope: $scope})
-//	  .then(function(popover)
-//	  {
-//		$scope.popover = popover;
-//	  });
-	
-	$ionicPopover.fromTemplateUrl('templates/login.html',
-	{
-    	scope: $scope
-  	})
-	.then(function(popover)
-  	{
-		$scope.popover = popover;
-		popover.show(".theMainView");
-	});
-
-	
-	$scope.openPopover = function($event)
-	{
-    	$scope.popover.show($event);
-  	};
- 	
-	$scope.$on('$display',function()
-	{
-//		$scope.openPopover(".theMainView");	
-		$scope.popover.show(".theMainView");
-	});
-	
-	
-	$scope.closePopover = function()
-	{
-    	$scope.popover.hide();
-  	};
-  	$scope.$on('$destroy', function()
-	{
-    	$scope.popover.remove();
-	});
-	
-	  $scope.$on('popover.hidden', function() 
-	{
-  	});
-
-  $scope.$on('popover.removed', function() {
-    // Execute action
-  });
+	return{
+		terminate: function()
+		{
+			if ($rootScope.isLoggedIn)
+			{
+				$rootScope.isLoggedIn=false;
+				window.localStorage.removeItem("FB_key");
+				location.href="";
+			}
+		}
+	}
 });

@@ -4,9 +4,9 @@
 // 'starter' is the name of this angular module example (also set in a <body> attribute in index.html)
 // the 2nd parameter is an array of 'requires'
 // 'starter.controllers' is found in controllers.js
-angular.module('starter', ['ionic', 'starter.controllers', 'ngCordovaOauth'])
+angular.module('starter', ['ionic', 'starter.controllers', 'ngCordova', 'ngCordovaOauth'])
 
-.run(function($ionicPlatform) {
+.run(function($ionicPlatform, $rootScope) {
   $ionicPlatform.ready(function() {
     // Hide the accessory bar by default (remove this to show the accessory bar above the keyboard
     // for form inputs)
@@ -19,6 +19,17 @@ angular.module('starter', ['ionic', 'starter.controllers', 'ngCordovaOauth'])
       // org.apache.cordova.statusbar required
       StatusBar.styleDefault();
     }
+	  
+	  //Checking for saved key here.
+	  $rootScope.token=window.localStorage.getItem("FB_key");
+	  if ($rootScope.token==undefined)
+	  {
+		  $rootScope.isLoggedIn=false;
+	  }
+	  else
+	  {
+		  $rootScope.isLoggedIn=true;
+	  }
   });
 })
 

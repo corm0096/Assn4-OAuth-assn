@@ -1,11 +1,16 @@
 <ion-view view-title="Playlists">
   <ion-content>
-   <p>Playlist - Not Name? Logout</p>
+  <div ng-show="isLoggedIn">
+	  <p>Playlist - Not {{token.username}}? <a href="" ng-click="terminate()"> Logout</a></p>
     <ion-list>
-<!--      <ion-item ng-repeat="playlist in playlists" href="#/app/playlists/{{playlist.id}}">-->
-             <ion-item ng-repeat="playlist in playlists" ng-click="popover.show($event)">
+      <ion-item ng-repeat="playlist in playlists" href="#/app/playlists/{{playlist.id}}">
         {{playlist.title}}
       </ion-item>
     </ion-list>
+    </div>
+    <div ng-show="!isLoggedIn">
+    	<p>Please log in.</p>
+    </div>
+	 
   </ion-content>
 </ion-view>
